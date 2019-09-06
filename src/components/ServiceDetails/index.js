@@ -54,8 +54,8 @@ class ServiceDetails extends Component {
   };
 
   render() {
-    const { classes, service, pricing, loading, error } = this.props;
-    const {  offlineNotication } = this.state;
+    const { classes, service, pricing, loading, error, history } = this.props;
+    const { offlineNotication } = this.state;
 
     if (isEmpty(service) || error) {
       if (loading) {
@@ -74,9 +74,9 @@ class ServiceDetails extends Component {
       {
         name: "About",
         activeIndex: 0,
-        component: <AboutService service={service} />,
+        component: <AboutService service={service} history={history} />,
       },
-      { name: "Install and Run", activeIndex: 1, component: <InstallAndRunService /> },
+      { name: "Install and Run", activeIndex: 1, component: <InstallAndRunService service={service} /> },
     ];
 
     return (
@@ -96,7 +96,12 @@ class ServiceDetails extends Component {
               star_rating={service.service_rating && service.service_rating.rating}
               totalRating={service.service_rating ? service.service_rating.total_users_rated : 0}
             />
-            <PricingDetails pricing={pricing} />
+            <PricingDetails
+              activeTab={activeTab}
+              pricing={pricing}
+              handleTabChange={this.handleTabChange}
+              history={history}
+            />
           </div>
           <StyledTabs tabs={tabs} activeTab={activeTab} onTabChange={this.handleTabChange} />
         </Grid>

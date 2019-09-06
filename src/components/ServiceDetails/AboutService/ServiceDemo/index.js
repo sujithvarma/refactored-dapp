@@ -9,6 +9,7 @@ import PurchaseToggler from "./PurchaseToggler";
 import { freeCalls, groupInfo } from "../../../../Redux/reducers/ServiceDetailsReducer";
 import { LoaderContent } from "../../../../utility/constants/LoaderContent";
 import AlertBox, { alertTypes } from "../../../common/AlertBox";
+import Routes from "../../../../utility/constants/Routes";
 
 const demoProgressStatus = {
   purchasing: 1,
@@ -30,6 +31,7 @@ class ServiceDemo extends Component {
     }
 
     await this.fetchFreeCallsUsage();
+    this.scrollToHash();
   };
 
   fetchFreeCallsUsage = () => {
@@ -41,6 +43,15 @@ class ServiceDemo extends Component {
     });
   };
 
+  scrollToHash = () => {
+    if (this.props.history.location.hash === Routes.hash.SERVICE_DEMO) {
+      window.scroll({
+        top: 520,
+        behavior: "smooth",
+      });
+    }
+  };
+
   computeActiveSection = () => {
     const { purchaseCompleted, isServiceExecutionComplete } = this.state;
     const { purchasing, executingAIservice, displayingResponse } = demoProgressStatus;
@@ -49,6 +60,7 @@ class ServiceDemo extends Component {
   };
 
   serviceRequestStartHandler = () => {
+    this.setState({ alert: {} });
     this.props.startLoader();
   };
 
@@ -65,8 +77,9 @@ class ServiceDemo extends Component {
   serviceRequestErrorHandler = error => {
     this.setState({
       isServiceExecutionComplete: false,
-      alert: { type: alertTypes.ERROR, message: error },
+      alert: { type: alertTypes.ERROR, message: "Service Execution went wrong. Please try again" },
     });
+    this.props.stopLoader();
   };
 
   handlePurchaseComplete = () => {
@@ -76,8 +89,9 @@ class ServiceDemo extends Component {
   handlePurchaseError = error => {
     this.setState({
       purchaseCompleted: false,
-      alert: { type: alertTypes.ERROR, message: error },
+      alert: { type: alertTypes.ERROR, message: "Purchase could not be completed. Please try again" },
     });
+    this.props.stopLoader();
   };
 
   render() {
@@ -112,6 +126,7 @@ class ServiceDemo extends Component {
             freeCallsAllowed,
             wallet,
             handlePurchaseError,
+            isServiceAvailable: Boolean(service.is_available),
           }}
           thirdPartyProps={{
             service_id: service.service_id,
